@@ -1,1 +1,910 @@
-# ecotech-verde
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTech Verde | Tecnología al Servicio del Planeta</title>
+    <meta name="description" content="Descubre cómo la tecnología verde puede reducir tu huella de carbono. Calculadora, apps y consejos eco-inteligentes.">
+    
+    <!-- Manifest para PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#27ae60">
+    
+    <style>
+        :root {
+            --primary: #27ae60;
+            --secondary: #3498db;
+            --text: #333;
+            --bg: #fff;
+            --card-bg: #f8f9fa;
+        }
+
+        [data-theme="dark"] {
+            --text: #eee;
+            --bg: #111;
+            --card-bg: #1a1a2e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header mejorado */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] header {
+            background: rgba(26, 26, 46, 0.95);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* Menú hamburguesa */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            z-index: 1001;
+        }
+
+        .hamburger, .hamburger::before, .hamburger::after {
+            width: 25px;
+            height: 3px;
+            background: var(--primary);
+            transition: 0.3s;
+        }
+
+        .hamburger {
+            position: relative;
+        }
+
+        .hamburger::before, .hamburger::after {
+            content: '';
+            position: absolute;
+            left: 0;
+        }
+
+        .hamburger::before { top: -8px; }
+        .hamburger::after { top: 8px; }
+
+        .menu-toggle.active .hamburger {
+            transform: rotate(45deg);
+        }
+
+        .menu-toggle.active .hamburger::before {
+            transform: rotate(90deg) translate(8px, 0);
+        }
+
+        .menu-toggle.active .hamburger::after {
+            transform: rotate(90deg) translate(-8px, 0);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-menu a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-menu a:hover::after {
+            width: 100%;
+        }
+
+        /* Modo oscuro toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+
+        /* Hero section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-top: 60px;
+            padding: 2rem;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-content p {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(39, 174, 96, 0.4);
+        }
+
+        /* Skeleton loading */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 10px;
+            min-height: 200px;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Secciones mejoradas */
+        .features, .tools, .eco-tips {
+            padding: 80px 0;
+            background: var(--bg);
+        }
+
+        .stats {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 3rem;
+            color: var(--text);
+        }
+
+        /* Grid mejorado */
+        .features-grid, .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Gamificación */
+        .points-badge {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            z-index: 999;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* Calculadora mejorada */
+        .calculator {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .calculator input, .calculator select {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .calculator button {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.3s;
+        }
+
+        .calculator button:hover {
+            background: #219a52;
+        }
+
+        .calculator button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* Notificaciones */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+            }
+
+            .nav-menu {
+                position: fixed;
+                top: 60px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 60px);
+                background: var(--bg);
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                padding-top: 2rem;
+                transition: left 0.3s;
+            }
+
+            .nav-menu.active {
+                left: 0;
+            }
+
+            .nav-menu a {
+                font-size: 1.2rem;
+                margin: 1rem 0;
+            }
+
+            .features-grid, .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .points-badge {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 1rem auto;
+            }
+        }
+
+        /* Animaciones */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .lazy-image.loaded {
+            opacity: 1;
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notificaciones -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Puntos de gamificación -->
+    <div class="points-badge" id="pointsBadge">
+        🌱 <span id="userPoints">0</span> puntos verdes
+    </div>
+
+    <header>
+        <div class="container nav-container">
+            <div class="logo">🌱 EcoTech Verde</div>
+            
+            <button class="menu-toggle" aria-label="Menú principal" aria-expanded="false">
+                <div class="hamburger"></div>
+            </button>
+            
+            <nav>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#tecnologias">Tecnologías</a></li>
+                    <li><a href="#herramientas">Herramientas</a></li>
+                    <li><a href="#accion">Actúa</a></li>
+                </ul>
+            </nav>
+            
+            <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+                🌓
+            </button>
+        </div>
+    </header>
+
+    <section class="hero" id="inicio">
+        <div class="hero-content">
+            <h1>Tecnología al Servicio del Planeta</h1>
+            <p>Descubre cómo la innovación tecnológica puede ser tu mejor aliada para cuidar el medio ambiente y construir un futuro sostenible.</p>
+            <a href="#tecnologias" class="cta-button">Explorar Soluciones</a>
+            
+            <!-- Botón de voz -->
+            <button onclick="startVoiceNav()" style="margin-left: 1rem; background: rgba(255,255,255,0.2); border: 2px solid white; color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer;">
+                🎤 Hablar
+            </button>
+        </div>
+    </section>
+
+    <section class="features" id="tecnologias">
+        <div class="container">
+            <h2 class="section-title">Tecnologías Verdes del Futuro</h2>
+            <div class="features-grid">
+                <div class="feature-card tooltip" data-tooltip="Ahorra hasta 40% en electricidad">
+                    <div class="feature-icon">☀️</div>
+                    <h3>Energía Solar Inteligente</h3>
+                    <p>Paneles solares con IA que optimizan la captación de energía según el clima y patrones de uso.</p>
+                </div>
+                <div class="feature-card tooltip" data-tooltip="Duración 5x mayor">
+                    <div class="feature-icon">🔋</div>
+                    <h3>Baterías de Grafito Reciclado</h3>
+                    <p>Nuevas baterías fabricadas con grafito reciclado de dispositivos electrónicos.</p>
+                </div>
+                <div class="feature-card tooltip" data-tooltip="Monitoreo 24/7">
+                    <div class="feature-icon">💧</div>
+                    <h3>Purificadores IoT</h3>
+                    <p>Sistemas conectados que monitorean y purifican el aire y agua en tiempo real.</p>
+                </div>
+                <div class="feature-card tooltip" data-tooltip="95% menos agua">
+                    <div class="feature-icon">🌾</div>
+                    <h3>Agricultura Vertical AI</h3>
+                    <p>Cultivos urbanos controlados por inteligencia artificial que producen todo el año.</p>
+                </div>
+                <div class="feature-card tooltip" data-tooltip="Devuelve energía a la red">
+                    <div class="feature-icon">🚗</div>
+                    <h3>Vehículos V2G</h3>
+                    <p>Coches eléctricos que devuelven energía a la red cuando no se usan.</p>
+                </div>
+                <div class="feature-card tooltip" data-tooltip="Recompensas por reciclar">
+                    <div class="feature-icon">♻️</div>
+                    <h3>Blockchain de Reciclaje</h3>
+                    <p>Tecnología que rastrea y recompensa el reciclaje correcto con criptomonedas verdes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="container">
+            <h2 class="section-title">Impacto Real de la Tecnología Verde</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" data-value="75">0</div>
+                    <p>Ahorro energético con LED vs bombillas tradicionales</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-value="90">0</div>
+                    <p>Reducción de emisiones con energía solar y eólica</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-value="1000">0</div>
+                    <p>GW de energía eólica generada anualmente</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-value="84">0</div>
+                    <p>Reducción de huella de carbono con cloud computing</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="eco-tips">
+        <div class="container">
+            <h2 class="section-title">Consejos Tech para un Hogar Verde</h2>
+            <div class="tips-container">
+                <div class="tip-item">
+                    <h4>🏠 Automatización Inteligente</h4>
+                    <p>Instala termostatos inteligentes que aprenden tus hábitos y reducen hasta un 23% el consumo energético.</p>
+                </div>
+                <div class="tip-item">
+                    <h4>📱 Apps de Monitoreo</h4>
+                    <p>Usa apps como "Joulebug" para rastrear tu huella de carbono y recibir recomendaciones personalizadas.</p>
+                </div>
+                <div class="tip-item">
+                    <h4>💡 Iluminación LED Conectada</h4>
+                    <p>Controla tus luces desde el móvil y programa horarios para ahorrar energía automáticamente.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tools" id="herramientas">
+        <div class="container">
+            <h2 class="section-title">Herramientas para Medir tu Impacto</h2>
+            
+            <div class="calculator">
+                <h3>Calculadora de Huella de Carbono Personal</h3>
+                <input type="number" id="km" placeholder="Kilómetros conducidos al mes" min="0">
+                <select id="energy">
+                    <option value="">Selecciona tu fuente de energía</option>
+                    <option value="renewable">100% Renovables</option>
+                    <option value="mixed">Mixta (50/50)</option>
+                    <option value="fossil">Mayormente Fósil</option>
+                </select>
+                <input type="number" id="flights" placeholder="Vuelos al año" min="0">
+                <button onclick="calculateFootprint()" id="calcBtn">
+                    Calcular Impacto
+                </button>
+                <div id="result" style="margin-top: 20px;"></div>
+                
+                <!-- Gráfico de progreso -->
+                <canvas id="progressChart" style="margin-top: 20px; max-width: 100%;"></canvas>
+            </div>
+
+            <h3 style="text-align: center; margin-top: 60px;">Apps Recomendadas</h3>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h4>📱 Too Good To Go</h4>
+                    <p>Rescata alimentos que van a ser desechados por restaurantes y tiendas a precios reducidos.</p>
+                    <button onclick="installApp('toogoodtogo')" class="install-btn">Instalar</button>
+                </div>
+                <div class="tool-card">
+                    <h4>🌍 Ecosia</h4>
+                    <p>Navegador que planta árboles con tus búsquedas. ¡Ya han plantado más de 150 millones!</p>
+                    <button onclick="installApp('ecosia')" class="install-btn">Instalar</button>
+                </div>
+                <div class="tool-card">
+                    <h4>♻️ Recycle Coach</h4>
+                    <p>Te avisa cuándo es la recolección de reciclaje en tu zona y qué materiales se pueden reciclar.</p>
+                    <button onclick="installApp('recycle')" class="install-btn">Instalar</button>
+                </div>
+                <div class="tool-card">
+                    <h4>💧 Dropcountr</h4>
+                    <p>Monitorea tu consumo de agua en tiempo real y recibe alertas sobre fugas o uso excesivo.</p>
+                    <button onclick="installApp('dropcountr')" class="install-btn">Instalar</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="action-section" id="accion">
+        <div class="container">
+            <h2 class="section-title">¡Empieza tu Transformación Verde Hoy!</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">Cada acción cuenta. Con estas tecnologías, ser sostenible es más fácil que nunca.</p>
+            <div class="action-buttons">
+                <button class="action-button" onclick="downloadGuide()">📥 Descargar Guía</button>
+                <button class="action-button" onclick="shareProgress()">📤 Compartir Progreso</button>
+                <button class="action-button" onclick="scheduleConsultation()">📅 Agendar Asesoría</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 EcoTech Verde. Construyendo un futuro sostenible juntos.</p>
+            <p style="margin-top: 10px;">
+                <button onclick="toggleTheme()" style="background: none; border: none; color: white; cursor: pointer;">
+                    🌓 Cambiar tema
+                </button>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Service Worker para PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+
+    <script>
+        // Variables globales
+        let userPoints = parseInt(localStorage.getItem('greenPoints')) || 0;
+        let chart = null;
+
+        // Sistema de temas
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 
+                              (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            html.setAttribute('data-theme', savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            showNotification(`Tema cambiado a ${newTheme}`);
+        }
+
+        // Menú móvil
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navMenu = document.getElementById('navMenu');
+
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+            menuToggle.setAttribute('aria-expanded', navMenu.classList.contains('active'));
+        });
+
+        // Cerrar menú al hacer clic en un enlace
+        document.querySelectorAll('.nav-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                menuToggle.classList.remove('active');
+            });
+        });
+
+        // Notificaciones
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        }
+
+        // Sistema de puntos
+        function updatePoints() {
+            document.getElementById('userPoints').textContent = userPoints;
+            localStorage.setItem('greenPoints', userPoints);
+        }
+
+        // Calculadora mejorada
+        function calculateFootprint() {
+            const km = parseInt(document.getElementById('km').value) || 0;
+            const energy = document.getElementById('energy').value;
+            const flights = parseInt(document.getElementById('flights').value) || 0;
+            
+            if (!km || !energy || !flights) {
+                showNotification('Por favor completa todos los campos');
+                return;
+            }
+
+            document.getElementById('calcBtn').disabled = true;
+            document.getElementById('calcBtn').textContent = 'Calculando...';
+
+            setTimeout(() => {
+                let carbon = 0;
+                carbon += km * 0.12;
+                carbon += flights * 200;
+                
+                switch(energy) {
+                    case 'renewable': carbon += 50; break;
+                    case 'mixed': carbon += 200; break;
+                    case 'fossil': carbon += 400; break;
+                }
+
+                const earnedPoints = Math.floor(carbon / 10);
+                userPoints += earnedPoints;
+                updatePoints();
+
+                const result = document.getElementById('result');
+                result.innerHTML = `
+                    <div style="padding: 20px; border-radius: 10px; background: ${carbon > 1000 ? '#ff6b6b22' : '#27ae6022'}">
+                        <p style="color: ${carbon > 1000 ? '#e74c3c' : '#27ae60'}">
+                            <strong>Tu huella anual: ${carbon.toFixed(0)} kg CO2</strong>
+                        </p>
+                        <p>¡Has ganado ${earnedPoints} puntos verdes! 💚</p>
+                        <p>Puntos totales: ${userPoints}</p>
+                    </div>
+                `;
+
+                document.getElementById('calcBtn').disabled = false;
+                document.getElementById('calcBtn').textContent = 'Calcular Impacto';
+
+                // Guardar en historial
+                saveCalculation({km, energy, flights, carbon, date: new Date().toISOString()});
+            }, 1000);
+        }
+
+        function saveCalculation(data) {
+            const history = JSON.parse(localStorage.getItem('calculationHistory') || '[]');
+            history.unshift(data);
+            if (history.length > 5) history.pop();
+            localStorage.setItem('calculationHistory', JSON.stringify(history));
+        }
+
+        // Navegación por voz
+        function startVoiceNav() {
+            if ('webkitSpeechRecognition' in window) {
+                const recognition = new webkitSpeechRecognition();
+                recognition.lang = 'es-ES';
+                recognition.continuous = false;
+                
+                recognition.onstart = () => {
+                    showNotification('🎤 Escuchando... Di "tecnologías", "herramientas" o "actúa"');
+                };
+                
+                recognition.onresult = (e) => {
+                    const command = e.results[0][0].transcript.toLowerCase();
+                    const commands = {
+                        'tecnologías': '#tecnologias',
+                        'herramientas': '#herramientas',
+                        'actúa': '#accion',
+                        'inicio': '#inicio'
+                    };
+                    
+                    Object.keys(commands).forEach(key => {
+                        if (command.includes(key)) {
+                            document.querySelector(commands[key]).scrollIntoView({behavior: 'smooth'});
+                            showNotification(`Navegando a ${key}`);
+                        }
+                    });
+                };
+                
+                recognition.onerror = () => {
+                    showNotification('Error al reconocer voz. Intenta de nuevo.');
+                };
+                
+                recognition.start();
+            } else {
+                showNotification('Tu navegador no soporta reconocimiento de voz');
+            }
+        }
+
+        // Funciones de acción
+        function downloadGuide() {
+            // Simular descarga
+            showNotification('📥 Guía descargada en tu dispositivo');
+            userPoints += 10;
+            updatePoints();
+        }
+
+        function shareProgress() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Mi progreso ecológico',
+                    text: `He ahorrado ${userPoints * 10}kg de CO2 con EcoTech Verde`,
+                    url: window.location.href
+                });
+            } else {
+                showNotification('🔗 Enlace copiado al portapapeles');
+            }
+        }
+
+        function scheduleConsultation() {
+            showNotification('📅 Redirigiendo a WhatsApp...');
+            setTimeout(() => {
+                window.open('https://wa.me/1234567890?text=Quiero%20agendar%20una%20asesoría%20eco-tecnológica', '_blank');
+            }, 1000);
+        }
+
+        function installApp(app) {
+            showNotification(`📱 Redirigiendo a ${app}...`);
+            const urls = {
+                'toogoodtogo': 'https://toogoodtogo.com/es',
+                'ecosia': 'https://www.ecosia.org/',
+                'recycle': 'https://recyclecoach.com/',
+                'dropcountr': 'https://dropcountr.com/'
+            };
+            setTimeout(() => window.open(urls[app], '_blank'), 500);
+        }
+
+        // Animación de números
+        function animateNumbers() {
+            const numbers = document.querySelectorAll('.stat-number');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = parseInt(entry.target.dataset.value);
+                        const increment = target / 50;
+                        let current = 0;
+                        
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= target) {
+                                current = target;
+                                clearInterval(timer);
+                            }
+                            
+                            const suffix = entry.target.textContent.includes('GW') ? 'GW' : '%';
+                            entry.target.textContent = Math.floor(current) + (target >= 1000 ? '+' : suffix);
+                        }, 50);
+                        
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+            
+            numbers.forEach(num => observer.observe(num));
+        }
+
+        // Lazy loading
+        function initLazyLoading() {
+            const images = document.querySelectorAll('.lazy-image');
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('loaded');
+                        imageObserver.unobserve(entry.target);
+                    }
+                });
+            });
+            
+            images.forEach(img => imageObserver.observe(img));
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            updatePoints();
+            animateNumbers();
+            initLazyLoading();
+            
+            // Notificación de bienvenida
+            if (!localStorage.getItem('welcomeShown')) {
+                setTimeout(() => {
+                    showNotification('¡Bienvenido a EcoTech Verde! 🌱');
+                    localStorage.setItem('welcomeShown', 'true');
+                }, 2000);
+            }
+
+            // Solicitar permiso para notificaciones
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        });
+
+        // Smooth scroll para anclas
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
